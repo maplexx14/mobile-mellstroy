@@ -1,0 +1,131 @@
+/*
+ * Portrait layout overrides. Loaded after ctr-1920.css. The body carries both
+ * `ui-1920` (so all sprite/button/element styling and image URLs apply) and
+ * `ui-portrait` (these rules), which only re-sizes the containers and
+ * re-positions panels for a 720x1280 vertical phone screen.
+ *
+ * Coordinate space: UI_WIDTH x UI_HEIGHT = 720 x 1280 (see portrait.ts).
+ * NOTE: positions below are a first pass and are tuned visually against the
+ * reference screenshots in exp/.
+ */
+
+/* ---- Structure: make every full-screen layer portrait ---- */
+.ui-portrait #gameContainer {
+    margin: 0;
+    width: 720px;
+    height: 1280px;
+}
+
+.ui-portrait #gameArea,
+.ui-portrait .panel,
+.ui-portrait #shadowCanvas {
+    width: 720px;
+    height: 1280px;
+}
+
+.ui-portrait #c,
+.ui-portrait #e {
+    width: 720px;
+    height: 1280px;
+}
+
+.ui-portrait #levelMenu {
+    width: 720px;
+    height: 1280px;
+    padding-top: 520px;
+}
+
+/* Decorative full-screen backgrounds: cover the taller frame. */
+.ui-portrait #startBackground,
+.ui-portrait #menuBackground {
+    background-size: cover;
+    background-position: center;
+}
+
+/* ---- Main menu (exp/2.jpg): logo top, candy, stacked buttons, icons ---- */
+.ui-portrait #menuLogo {
+    left: 34px;
+    top: 110px;
+}
+
+.ui-portrait #menuCandySkin {
+    left: 300px;
+    top: 600px;
+}
+
+.ui-portrait #menuCandyHand {
+    left: 430px;
+    top: 660px;
+}
+
+.ui-portrait #menuBtnVbox {
+    left: 76px;
+    top: 820px;
+}
+
+/* ---- Level select (exp/3.png): grid anchor + chrome ---- */
+/* Cardboard background so the panel never shows black when the box menu is
+   skipped (the default #levelBackground layer is hidden). */
+.ui-portrait #levelPanel {
+    background-image: url(../images/1920/ui/menubg.webp);
+    background-size: cover;
+    background-position: center;
+}
+
+.ui-portrait #levelOptions {
+    top: 100px;
+    left: 360px; /* JS positions tiles relative to this anchor (see LevelPanel) */
+}
+
+.ui-portrait #levelScore {
+    top: 41px;
+    right: 50px;
+}
+
+.ui-portrait .bBtn {
+    top: 1120px;
+    left: 30px;
+}
+
+.ui-portrait #levelNavBack {
+    top: 600px;
+    left: 10px;
+}
+
+.ui-portrait #levelNavForward {
+    top: 600px;
+    left: 600px;
+}
+
+/* ---- In-game HUD (exp/1.png): button tray top-right ---- */
+.ui-portrait #gameBtnTray {
+    right: 8px;
+    top: 12px;
+}
+
+/* ---- Level results (exp/fix2.png): the 1069px-wide results block is wider
+   than the 720 portrait panel, so stars/buttons overflowed. Scale the whole
+   block down to fit while keeping its internal landscape layout. ---- */
+.ui-portrait #levelResults {
+    /* 1069px element in a 720px panel: shift left by (1069-720)/2 to center the
+       layout box, then scale(0.66) around top-center keeps it visually centred. */
+    margin-top: 240px;
+    margin-left: -175px;
+    transform: scale(0.66);
+    transform-origin: top center;
+}
+
+/* ---- Box-open transition (between level select and the level): keep the
+   decorative cutter/tape inside the 720-wide frame. The door canvases now fill
+   the portrait canvas (see Doors.ts), so no black gap remains. ---- */
+.ui-portrait #boxCutter {
+    left: 230px;
+    transform: scale(0.5);
+    transform-origin: center top;
+}
+
+.ui-portrait #tapeRoll {
+    left: 300px;
+    transform: scale(0.6);
+    transform-origin: center top;
+}
