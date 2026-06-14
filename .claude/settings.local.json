@@ -4,7 +4,10 @@
       "Bash(git fetch:*)",
       "Bash(git rebase:*)",
       "Bash(git add:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(python3 -c \"import importlib; mods=['PIL','Pillow','cv2','skimage']; [print\\(m, importlib.import_module\\(m\\)\\) for m in mods if __import__\\('importlib'\\).util.find_spec\\(m\\)]\")",
+      "Bash(pip3 list *)",
+      "Bash(curl -s -o /dev/null -w \"localhost:4173 -> HTTP %{http_code}\\\\n\" http://localhost:4173/cuttherope-h5dx/)"
     ]
   }
 }

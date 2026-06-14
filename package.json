@@ -4,8 +4,12 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
+        "predev": "node scripts/bundleLevels.js",
         "dev": "vite",
+        "prebuild": "node scripts/bundleLevels.js",
         "build": "vite build && node scripts/compressJson.js",
+        "build:pages": "node scripts/bundleLevels.js && VITE_BASE_NETLIFY=/ vite build && node scripts/compressJson.js && node scripts/pruneDist.js",
+        "bundle:levels": "node scripts/bundleLevels.js",
         "preview": "vite preview",
         "typecheck": "tsc --noEmit",
         "format": "prettier --write .",

@@ -109,15 +109,70 @@
     top: 12px;
 }
 
-/* ---- Level results: the 1069px-wide landscape block scaled to fit portrait.
-   margin-left centers the layout box before transform; scale(0.66) then keeps
-   it visually centred in the 720px panel. margin-top centers vertically in
-   the 1560px canvas (visual height after scale ≈ 560px). ---- */
+/* ---- Level results: full-width portrait layout, buttons stacked vertically.
+   Reset the landscape geometry and lay everything out natively for 720px. ---- */
 .ui-portrait #levelResults {
-    margin-top: 500px;
-    margin-left: -175px;
-    transform: scale(0.66);
-    transform-origin: top center;
+    width: 680px;
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+}
+
+/* Status text ("Уровень пройден" etc): keep absolute so it doesn't push
+   stars into the flex stack and doesn't appear as an extra button. */
+.ui-portrait #resultStatus {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 680px;
+    text-align: center;
+}
+
+/* Stars: push down below the status canvas (~120 px tall). */
+.ui-portrait #levelResults .starCase {
+    top: 0;
+    margin: 120px auto 40px;
+}
+
+/* Hide landscape-only decorations. */
+.ui-portrait #levelResults .line { display: none; }
+.ui-portrait #resultScore        { display: none; }
+.ui-portrait #resultTicker       { display: none; }
+
+/* Vertical button stack, centred, large touch targets. */
+.ui-portrait #levelResults .btnCase {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 680px;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-top: 0;
+}
+
+/* Button order: вперёд → ещё раз → меню */
+.ui-portrait #nextBtn   { order: 1; }
+.ui-portrait #replayBtn { order: 2; }
+.ui-portrait #lrMenuBtn { order: 3; margin: 0; }
+
+/* Un-float and enlarge buttons.
+   Sprite sheet has 2 frames stacked (normal + pressed), each 122px tall.
+   We want each frame 150px tall → full sheet height = 300px.
+   background-size covers the full sheet; hover shifts by one frame height. */
+.ui-portrait #levelResults .btnCase .sBtn {
+    float: none;
+    width: 620px;
+    height: 150px;
+    background-size: 620px 300px;
+}
+.ui-portrait #levelResults .btnCase .sBtn:hover {
+    background-position: left -150px;
 }
 
 /* ---- Box-open transition: keep the decorative cutter/tape inside the frame.

@@ -35,6 +35,10 @@ class JsonLoader {
 
     private checkCompleteCallback: (() => void) | null = null;
 
+    private metadataCompleteCallback: (() => void) | null = null;
+
+    private metadataNotified = false;
+
     private progressCallback: ProgressCallback | null = null;
 
     private readonly jsonCache = new Map<string, JsonCacheEntry | MenuStringEntry[]>();
@@ -49,6 +53,23 @@ class JsonLoader {
 
     onMenuComplete(callback: () => void): void {
         this.checkCompleteCallback = callback;
+    }
+
+    /**
+     * Fires as soon as box metadata + menu strings are available — before the
+     * (much larger) level data finishes loading. Lets image/sound loading start
+     * in parallel with level loading instead of waiting behind it.
+     */
+    onMetadataComplete(callback: () => void): void {
+        this.metadataCompleteCallback = callback;
+    }
+
+    private notifyMetadataComplete(): void {
+        if (this.metadataNotified) {
+            return;
+        }
+        this.metadataNotified = true;
+        this.metadataCompleteCallback?.();
     }
 
     async start(): Promise<void> {
@@ -68,7 +89,11 @@ class JsonLoader {
             this.jsonCache.set("boxMetadata", boxMetadata);
             this.jsonCache.set("menuStrings", menuStrings);
 
-            const levelFiles: { url: string; key: string }[] = [];
+            // Metadata is enough to begin image/sound loading; kick that off now
+            // so it overlaps with level loading below.
+            this.notifyMetadataComplete();
+
+            const levelFiles: { url: string; key: string; bundleKey: string }[] = [];
 
             // Queue level files based on levelCount from metadata
             boxMetadata.forEach((box, index) => {
@@ -79,6 +104,7 @@ class JsonLoader {
                         levelFiles.push({
                             url: `${baseUrl}/data/boxes/levels/${boxStr}-${levelStr}.json`,
                             key: `level-${boxStr}-${levelStr}`,
+                            bundleKey: `${boxStr}-${levelStr}`,
                         });
                     }
                 }
@@ -90,30 +116,78 @@ class JsonLoader {
 
             this.progressCallback?.(this.loadedJsonFiles, this.totalJsonFiles);
 
-            // Load all level JSON files
-            const promises = levelFiles.map(async ({ url, key }) => {
-                try {
-                    const data = await loadJson<LevelJson>(url);
-                    this.jsonCache.set(key, data);
-                    this.loadedJsonFiles++;
-                    this.progressCallback?.(this.loadedJsonFiles, this.totalJsonFiles);
-                    return { success: true as const, key };
-                } catch (error) {
-                    // Silent fail for level files that might not exist
-                    this.loadedJsonFiles++;
-                    this.progressCallback?.(this.loadedJsonFiles, this.totalJsonFiles);
-                    return { success: false as const, key, silent: true };
-                }
-            });
+            // Fast path: a single pre-bundled file with every level collapses
+            // hundreds of startup requests into one. Falls back to per-file
+            // loading if the bundle is missing or malformed.
+            const bundleLoaded = await this.loadLevelBundle(`${baseUrl}/data/boxes/levels.bundle.json`, levelFiles);
 
-            await Promise.all(promises);
+            if (!bundleLoaded) {
+                // Fallback: load all level JSON files individually
+                const promises = levelFiles.map(async ({ url, key }) => {
+                    try {
+                        const data = await loadJson<LevelJson>(url);
+                        this.jsonCache.set(key, data);
+                        this.loadedJsonFiles++;
+                        this.progressCallback?.(this.loadedJsonFiles, this.totalJsonFiles);
+                        return { success: true as const, key };
+                    } catch (error) {
+                        // Silent fail for level files that might not exist
+                        this.loadedJsonFiles++;
+                        this.progressCallback?.(this.loadedJsonFiles, this.totalJsonFiles);
+                        return { success: false as const, key, silent: true };
+                    }
+                });
+
+                await Promise.all(promises);
+            }
+
             this.menuJsonLoadComplete = true;
             this.checkCompleteCallback?.();
         } catch (error) {
             this.failedJsonFiles++;
             window.console?.error?.("Failed to load box metadata", error);
+            // Still kick off image/sound loading so the menu can complete.
+            this.notifyMetadataComplete();
             this.menuJsonLoadComplete = true;
             this.checkCompleteCallback?.();
+        }
+    }
+
+    /**
+     * Attempt to populate the level cache from a single bundled JSON file.
+     * @returns true if the bundle was fetched and applied, false to trigger
+     * the per-file fallback.
+     */
+    private async loadLevelBundle(
+        url: string,
+        levelFiles: { key: string; bundleKey: string }[]
+    ): Promise<boolean> {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                return false;
+            }
+
+            const bundle = JSON.parse(await response.text()) as Record<string, LevelJson>;
+            if (!bundle || typeof bundle !== "object") {
+                return false;
+            }
+
+            for (const { key, bundleKey } of levelFiles) {
+                const data = bundle[bundleKey];
+                if (data) {
+                    this.jsonCache.set(key, data);
+                }
+                // Count every expected level toward progress whether present or not,
+                // matching the per-file fallback's silent-miss behaviour.
+                this.loadedJsonFiles++;
+            }
+
+            this.progressCallback?.(this.loadedJsonFiles, this.totalJsonFiles);
+            return true;
+        } catch (error) {
+            window.console?.warn?.("Level bundle unavailable, falling back to per-file load", error);
+            return false;
         }
     }
 

@@ -244,8 +244,10 @@ class PreLoader {
             this.updateProgress();
         });
 
-        JsonLoader.onMenuComplete(() => {
-            this.menuJsonLoadComplete = true;
+        // Box metadata is enough to begin image/sound loading. Start it as soon
+        // as metadata is ready so it overlaps with (rather than waits behind)
+        // level-data loading.
+        JsonLoader.onMetadataComplete(() => {
             const { trackedResourceCount } = this.loadImages();
 
             this.totalImages = trackedResourceCount;
@@ -262,6 +264,13 @@ class PreLoader {
             });
 
             SoundLoader.start();
+        });
+
+        // Level data finishing only flips the JSON gate; images/sounds already
+        // started on metadata-complete above.
+        JsonLoader.onMenuComplete(() => {
+            this.menuJsonLoadComplete = true;
+            this.checkMenuLoadComplete();
         });
 
         void JsonLoader.start();

@@ -27,6 +27,14 @@
         <link href="/css/menu_logo_web.css" rel="stylesheet" type="text/css" />
         <link href="/css/skin_selection_web.css" rel="stylesheet" type="text/css" />
 
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <script>
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.expand();
+                window.Telegram.WebApp.disableVerticalSwipes?.();
+            }
+        </script>
+
         <script src="/src/ctr.ts" type="module"></script>
 
         <noscript>

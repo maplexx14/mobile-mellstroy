@@ -16,6 +16,15 @@ export default defineConfig(({ mode }) => {
 
     return {
         base: base,
+        server: {
+            host: true,
+            allowedHosts: true,
+        },
+        preview: {
+            host: true,
+            // Allow serving the production build through tunnels (ngrok, etc.).
+            allowedHosts: true,
+        },
         plugins: [
             enablePWA &&
                 VitePWA({

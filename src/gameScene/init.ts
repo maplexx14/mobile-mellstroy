@@ -324,7 +324,7 @@ abstract class GameSceneInit extends BaseElement {
         this.candy.anchor = Alignment.CENTER;
         this.candy.bb = Rectangle.copy(resolution.CANDY_BB);
         this.candy.passTransformationsToChilds = false;
-        this.candy.scaleX = this.candy.scaleY = 0.71;
+        this.candy.scaleX = this.candy.scaleY = 0.15;
         this.candy.drawPosIncrement = 0.0001;
 
         this.candyMain = new GameObject();
@@ -333,7 +333,7 @@ abstract class GameSceneInit extends BaseElement {
         this.candyMain.doRestoreCutTransparency();
         this.candyMain.anchor = this.candyMain.parentAnchor = Alignment.CENTER;
         this.candy.addChild(this.candyMain);
-        this.candyMain.scaleX = this.candyMain.scaleY = 0.71;
+        this.candyMain.scaleX = this.candyMain.scaleY = 0.15;
         this.candyMain.drawPosIncrement = 0.0001;
 
         this.candyTop = new GameObject();
@@ -342,7 +342,7 @@ abstract class GameSceneInit extends BaseElement {
         this.candyTop.doRestoreCutTransparency();
         this.candyTop.anchor = this.candyTop.parentAnchor = Alignment.CENTER;
         this.candy.addChild(this.candyTop);
-        this.candyTop.scaleX = this.candyTop.scaleY = 0.71;
+        this.candyTop.scaleX = this.candyTop.scaleY = 0.15;
         this.candyTop.drawPosIncrement = 0.0001;
 
         this.candyBlink = new Animation();
@@ -383,7 +383,7 @@ abstract class GameSceneInit extends BaseElement {
         }
         this.candyBlink.visible = false;
         this.candyBlink.anchor = this.candyBlink.parentAnchor = Alignment.CENTER;
-        this.candyBlink.scaleX = this.candyBlink.scaleY = 0.71;
+        this.candyBlink.scaleX = this.candyBlink.scaleY = 0.15;
         this.candy.addChild(this.candyBlink);
         (this.candyBlink as Animation & { drawPosIncrement?: number }).drawPosIncrement = 0.0001;
 

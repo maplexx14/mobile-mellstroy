@@ -51,6 +51,12 @@ class ZoomManager {
     autoResize(): void {
         window.addEventListener("resize", () => this.resize());
         window.visualViewport?.addEventListener("resize", () => this.resize());
+
+        const tg = (window as any).Telegram?.WebApp;
+        if (tg) {
+            tg.onEvent("viewportChanged", () => this.resize());
+        }
+
         this.resize();
     }
 
