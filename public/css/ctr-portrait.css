@@ -2,37 +2,38 @@
  * Portrait layout overrides. Loaded after ctr-1920.css. The body carries both
  * `ui-1920` (so all sprite/button/element styling and image URLs apply) and
  * `ui-portrait` (these rules), which only re-sizes the containers and
- * re-positions panels for a 720x1280 vertical phone screen.
+ * re-positions panels for a 720x1560 vertical phone screen.
  *
- * Coordinate space: UI_WIDTH x UI_HEIGHT = 720 x 1280 (see portrait.ts).
- * NOTE: positions below are a first pass and are tuned visually against the
- * reference screenshots in exp/.
+ * Coordinate space: UI_WIDTH x UI_HEIGHT = 720 x 1560 (see portrait.ts).
+ * ZoomManager uses fit-to-width so the canvas fills the phone viewport width
+ * exactly (zoom = vpW/720). At 390px wide that gives zoom≈0.54, scaled canvas
+ * ≈390×844 — matching iPhone 14's 9:19.5 ratio with no cropping.
  */
 
 /* ---- Structure: make every full-screen layer portrait ---- */
 .ui-portrait #gameContainer {
     margin: 0;
     width: 720px;
-    height: 1280px;
+    height: 1560px;
 }
 
 .ui-portrait #gameArea,
 .ui-portrait .panel,
 .ui-portrait #shadowCanvas {
     width: 720px;
-    height: 1280px;
+    height: 1560px;
 }
 
 .ui-portrait #c,
 .ui-portrait #e {
     width: 720px;
-    height: 1280px;
+    height: 1560px;
 }
 
 .ui-portrait #levelMenu {
     width: 720px;
-    height: 1280px;
-    padding-top: 520px;
+    height: 1560px;
+    padding-top: 640px;
 }
 
 /* Decorative full-screen backgrounds: cover the taller frame. */
@@ -50,17 +51,22 @@
 
 .ui-portrait #menuCandySkin {
     left: 300px;
-    top: 600px;
+    top: 700px;
 }
 
 .ui-portrait #menuCandyHand {
     left: 430px;
-    top: 660px;
+    top: 760px;
 }
 
 .ui-portrait #menuBtnVbox {
     left: 76px;
-    top: 820px;
+    top: 1000px;
+}
+
+.ui-portrait #miniOptionsMenu {
+    top: 1380px;
+    left: 28px;
 }
 
 /* ---- Level select (exp/3.png): grid anchor + chrome ---- */
@@ -83,17 +89,17 @@
 }
 
 .ui-portrait .bBtn {
-    top: 1120px;
+    top: 1400px;
     left: 30px;
 }
 
 .ui-portrait #levelNavBack {
-    top: 600px;
+    top: 700px;
     left: 10px;
 }
 
 .ui-portrait #levelNavForward {
-    top: 600px;
+    top: 700px;
     left: 600px;
 }
 
@@ -103,21 +109,19 @@
     top: 12px;
 }
 
-/* ---- Level results (exp/fix2.png): the 1069px-wide results block is wider
-   than the 720 portrait panel, so stars/buttons overflowed. Scale the whole
-   block down to fit while keeping its internal landscape layout. ---- */
+/* ---- Level results: the 1069px-wide landscape block scaled to fit portrait.
+   margin-left centers the layout box before transform; scale(0.66) then keeps
+   it visually centred in the 720px panel. margin-top centers vertically in
+   the 1560px canvas (visual height after scale ≈ 560px). ---- */
 .ui-portrait #levelResults {
-    /* 1069px element in a 720px panel: shift left by (1069-720)/2 to center the
-       layout box, then scale(0.66) around top-center keeps it visually centred. */
-    margin-top: 240px;
+    margin-top: 500px;
     margin-left: -175px;
     transform: scale(0.66);
     transform-origin: top center;
 }
 
-/* ---- Box-open transition (between level select and the level): keep the
-   decorative cutter/tape inside the 720-wide frame. The door canvases now fill
-   the portrait canvas (see Doors.ts), so no black gap remains. ---- */
+/* ---- Box-open transition: keep the decorative cutter/tape inside the frame.
+   The door canvases now fill the portrait canvas (see Doors.ts). ---- */
 .ui-portrait #boxCutter {
     left: 230px;
     transform: scale(0.5);

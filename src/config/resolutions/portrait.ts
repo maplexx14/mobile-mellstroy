@@ -20,7 +20,7 @@ const resPortrait: Partial<ResolutionProfile> = {
     // side margins). Height is taller than the level (480 * 2.25 = 1080) so the
     // level is centred vertically via PMY with cardboard background above/below.
     CANVAS_WIDTH: 720,
-    CANVAS_HEIGHT: 1280,
+    CANVAS_HEIGHT: 1560,
     CANVAS_SCALE: 0.75,
 
     // Reuse the 1920 asset set; UI coordinate space is 720 wide.
@@ -30,7 +30,7 @@ const resPortrait: Partial<ResolutionProfile> = {
     UI_IMAGES_SCALE: 0.703125, // 720 / 1024, matching the other profiles' pattern
     UI_TEXT_SCALE: 1,
     UI_WIDTH: 720,
-    UI_HEIGHT: 1280,
+    UI_HEIGHT: 1560,
 
     BUNGEE_BEZIER_POINTS: 3,
     DEFAULT_BUNGEE_LINE_WIDTH: 6,

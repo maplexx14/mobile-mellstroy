@@ -75,9 +75,16 @@ class ZoomManager {
         const originalHeight = this.originalHeight;
 
         if (!skipZoom) {
-            // "cover": fill the whole viewport with a single uniform scale,
-            // cropping whichever axis overflows (no aspect distortion).
-            this.#zoom = Math.max(vpWidth / nativeWidth, vpHeight / nativeHeight);
+            if (this.#nativeHeight > this.#nativeWidth) {
+                // Portrait canvas: fit to viewport width so no content is
+                // cropped horizontally. Canvas height (1560) is chosen to match
+                // the 9:19.5 aspect ratio of most modern phones, so vertical
+                // black bars are also eliminated.
+                this.#zoom = vpWidth / nativeWidth;
+            } else {
+                // Landscape canvas: cover mode fills the viewport.
+                this.#zoom = Math.max(vpWidth / nativeWidth, vpHeight / nativeHeight);
+            }
         }
 
         this.#bgZoom = vpHeight / (originalHeight * this.#zoom);
