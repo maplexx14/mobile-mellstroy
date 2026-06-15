@@ -175,6 +175,22 @@
     background-position: left -150px;
 }
 
+/* ---- Box selection panel: center canvas and reposition nav arrows ---- */
+.ui-portrait #boxCanvas {
+    display: block;
+    margin: 0 auto;
+}
+
+.ui-portrait #boxNavBack,
+.ui-portrait #boxNavForward {
+    top: 464px;
+    left: 10px;
+}
+
+.ui-portrait #boxNavForward {
+    left: 599px;
+}
+
 /* ---- Box-open transition: keep the decorative cutter/tape inside the frame.
    The door canvases now fill the portrait canvas (see Doors.ts). ---- */
 .ui-portrait #boxCutter {

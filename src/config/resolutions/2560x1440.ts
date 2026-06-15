@@ -247,12 +247,12 @@ const res2560x1440: ResolutionProfile = {
      * @const
      * @type {Rectangle}
      */
-    CANDY_BB: new Rectangle(142, 157, 112, 104),
+    CANDY_BB: new Rectangle(117, 132, 162, 154),
     /**
      * @const
      * @type {Rectangle}
      */
-    CANDY_LR_BB: new Rectangle(155, 176, 88, 76),
+    CANDY_LR_BB: new Rectangle(130, 151, 138, 126),
 
     /**
      * @const

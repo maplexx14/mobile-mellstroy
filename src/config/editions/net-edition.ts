@@ -84,7 +84,7 @@ class NetEdition {
     drawingImageNames: string[] = [];
     editionImages = "";
     editionImageDirectory = "";
-    disableBoxMenu = true;
+    disableBoxMenu = false;
     enableBoxBackgroundEasterEgg = false;
     boxDirectory = "ui/";
     settingPrefix = "";

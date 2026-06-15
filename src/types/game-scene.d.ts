@@ -33,6 +33,7 @@ import type ConstrainedPoint from "@/physics/ConstrainedPoint";
 import type Drawing from "@/game/Drawing";
 import type * as GameSceneConstants from "@/gameScene/constants";
 import type ResourceIdValues from "@/resources/ResourceId";
+import type VideoCharacter from "@/gameScene/VideoCharacter";
 
 type PartsTypeValue =
     (typeof GameSceneConstants.PartsType)[keyof typeof GameSceneConstants.PartsType];
@@ -96,6 +97,7 @@ export interface GameScene extends BaseElement {
     initialCameraToStarDistance: number;
     support: ImageElement;
     target: GameObject;
+    videoCharacter: VideoCharacter | null;
     sleepAnimPrimary: Animation | null;
     sleepAnimSecondary: Animation | null;
     isNightTargetAwake: boolean | null;

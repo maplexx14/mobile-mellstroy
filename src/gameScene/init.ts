@@ -40,6 +40,7 @@ import type SteamTube from "@/game/SteamTube";
 import type Mouse from "@/game/Mouse";
 import type MiceObject from "@/game/MiceObject";
 import ConveyorBeltObject from "@/game/ConveyorBeltObject";
+import type VideoCharacter from "@/gameScene/VideoCharacter";
 import { initAnimations } from "./initGameScene/initAnimations";
 import { initBackground } from "./initGameScene/initBackground";
 import { resetGameState } from "./initGameScene/resetGameState";
@@ -172,6 +173,7 @@ abstract class GameSceneInit extends BaseElement {
     blinkTimer!: number;
     idlesTimer!: number;
     target!: GameObject;
+    videoCharacter: VideoCharacter | null = null;
     sleepAnimPrimary: Animation | null;
     sleepAnimSecondary: Animation | null;
     isNightTargetAwake: boolean | null;

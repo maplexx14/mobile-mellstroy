@@ -15,6 +15,7 @@ import settings from "@/game/CTRSettings";
 import ActionType from "@/visual/ActionType";
 import BoxType from "@/ui/BoxType";
 import * as GameSceneConstants from "@/gameScene/constants";
+import VideoCharacter from "@/gameScene/VideoCharacter";
 import type GameSceneLoaders from "../loaders";
 import type { TargetItem } from "../MapLayerItem";
 
@@ -27,6 +28,9 @@ export function loadTarget(this: GameSceneLoaders, item: TargetItem): void {
         };
     };
     this.target = target;
+
+    this.videoCharacter?.destroy();
+    this.videoCharacter = new VideoCharacter("/anims/out");
 
     const boxType = edition.boxTypes?.[LevelState.pack];
     const isHolidayBox = boxType === BoxType.HOLIDAY;
@@ -57,6 +61,7 @@ export function loadTarget(this: GameSceneLoaders, item: TargetItem): void {
     targetWithOverride.bb = Rectangle.copy(resolution.TARGET_BB);
     targetWithOverride.bbOverride = Rectangle.copy(resolution.TARGET_BB);
     const originalPlayTimeline = targetWithOverride.playTimeline;
+    const videoChar = this.videoCharacter;
     targetWithOverride.playTimeline = function (index: number) {
         originalPlayTimeline.call(this, index);
         const element = this as GameObject & {
@@ -69,7 +74,11 @@ export function loadTarget(this: GameSceneLoaders, item: TargetItem): void {
                 element.rbb = new Quad2D(element.bb.x, element.bb.y, element.bb.w, element.bb.h);
             }
         }
+        videoChar?.play(index);
     };
+
+    // Hide sprite — video is drawn instead.
+    target.visible = false;
     targetWithOverride.drawPosIncrement = 0.0001;
 
     targetWithOverride.addAnimationEndpoints(

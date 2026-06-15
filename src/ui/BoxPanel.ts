@@ -79,8 +79,9 @@ class BoxPanel extends Panel {
         this.to = 0;
         this.startTime = 0;
 
-        this.spacing = resolution.uiScaledNumber(600);
-        this.centerOffset = resolution.uiScaledNumber(312);
+        const isPortrait = resolution.UI_HEIGHT > resolution.UI_WIDTH;
+        this.spacing = isPortrait ? 720 : resolution.uiScaledNumber(600);
+        this.centerOffset = isPortrait ? 96 : resolution.uiScaledNumber(312);
 
         this.isMouseDown = false;
         this.downX = null;
@@ -112,8 +113,9 @@ class BoxPanel extends Panel {
                 return;
             }
 
+            const isPortrait = resolution.UI_HEIGHT > resolution.UI_WIDTH;
             this.canvas.width = resolution.uiScaledNumber(1024);
-            this.canvas.height = resolution.uiScaledNumber(576);
+            this.canvas.height = isPortrait ? 800 : resolution.uiScaledNumber(576);
 
             this.$navBack = document.getElementById("boxNavBack");
             this.$navForward = document.getElementById("boxNavForward");
@@ -305,8 +307,9 @@ class BoxPanel extends Panel {
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        const isPortrait = resolution.UI_HEIGHT > resolution.UI_WIDTH;
         const offsetX = this.centerOffset + offset;
-        const offsetY = resolution.uiScaledNumber(130);
+        const offsetY = isPortrait ? 200 : resolution.uiScaledNumber(130);
         ctx.translate(offsetX, offsetY);
 
         let boxOffset = 0;
@@ -489,18 +492,19 @@ class BoxPanel extends Panel {
 
     isMouseOverBox(x: number, y: number): boolean {
         const bounceBox = this.bounceBox;
-        if (
-            this.isBoxCentered &&
-            bounceBox &&
-            bounceBox.isClickable() &&
+        if (!this.isBoxCentered || !bounceBox || !bounceBox.isClickable()) return false;
+
+        const isPortrait = resolution.UI_HEIGHT > resolution.UI_WIDTH;
+        if (isPortrait) {
+            // box at canvas x=[114,607], y=[200,729] (centerOffset=96+18, offsetY=200, size=493x529)
+            return x > 114 && x < 607 && y > 200 && y < 729;
+        }
+        return (
             x > resolution.uiScaledNumber(340) &&
             x < resolution.uiScaledNumber(680) &&
             y > resolution.uiScaledNumber(140) &&
             y < resolution.uiScaledNumber(460)
-        ) {
-            return true;
-        }
-        return false;
+        );
     }
 
     pointerDown(x: number, y: number): void {

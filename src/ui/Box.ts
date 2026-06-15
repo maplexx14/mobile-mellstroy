@@ -231,6 +231,10 @@ class Box {
         const yOffset = resolution.uiScaledNumber(this.yOffset || 0);
         const shouldHideLockDetails = this.type === BoxType.HOLIDAY && !IS_XMAS;
 
+        // Scale factor to compensate for file-based images being sized for 1920 canvas.
+        const isPortrait = resolution.UI_HEIGHT > resolution.UI_WIDTH;
+        const imgScale = isPortrait ? 0.75 : (resolution.UI_IMAGES_SCALE / 1.875);
+
         if (isGameBox) {
             // draw the black area
             ctx.fillStyle = "rgb(45,45,53)";
@@ -246,7 +250,9 @@ class Box {
                 ctx.drawImage(
                     this.omNomImg,
                     omnomoffset + resolution.uiScaledNumber(4),
-                    resolution.uiScaledNumber(215)
+                    resolution.uiScaledNumber(215),
+                    this.omNomImg.naturalWidth * imgScale,
+                    this.omNomImg.naturalHeight * imgScale
                 );
             }
         }
@@ -255,7 +261,9 @@ class Box {
         ctx.drawImage(
             this.boxImg,
             resolution.uiScaledNumber(25),
-            resolution.uiScaledNumber(0) + yOffset
+            resolution.uiScaledNumber(0) + yOffset,
+            this.boxImg.naturalWidth * imgScale,
+            this.boxImg.naturalHeight * imgScale
         );
 
         if (isGameBox) {
@@ -285,7 +293,9 @@ class Box {
                 ctx.drawImage(
                     this.lockImg,
                     resolution.uiScaledNumber(23),
-                    resolution.uiScaledNumber(155) + lockYOffset
+                    resolution.uiScaledNumber(155) + lockYOffset,
+                    this.lockImg.naturalWidth * imgScale,
+                    this.lockImg.naturalHeight * imgScale
                 );
                 ctx.scale(1 / 1.015, 1);
 
@@ -296,8 +306,8 @@ class Box {
                     // Vertically center the number with the star
                     const textY = 25 + baseY + (starHeight - textHeight) / 2;
 
-                    ctx.drawImage(this.reqImg, labelX, textY, textWidth, textHeight);
-                    ctx.drawImage(this.starImg, labelX + textWidth + starLeftMargin, baseY);
+                    ctx.drawImage(this.reqImg, labelX, textY, textWidth * imgScale, textHeight * imgScale);
+                    ctx.drawImage(this.starImg, labelX + textWidth * imgScale + starLeftMargin, baseY, this.starImg.naturalWidth * imgScale, this.starImg.naturalHeight * imgScale);
                 }
 
                 /*
@@ -321,7 +331,9 @@ class Box {
                 ctx.drawImage(
                     this.perfectMark,
                     resolution.uiScaledNumber(50),
-                    resolution.uiScaledNumber(250)
+                    resolution.uiScaledNumber(250),
+                    this.perfectMark.naturalWidth * imgScale,
+                    this.perfectMark.naturalHeight * imgScale
                 );
             }
 
@@ -329,7 +341,13 @@ class Box {
             if (this.levelLabel !== null && this.boxLabelImg.complete) {
                 const labelX = resolution.uiScaledNumber(240);
                 const labelY = resolution.uiScaledNumber(280);
-                ctx.drawImage(this.boxLabelImg, labelX, labelY);
+                ctx.drawImage(
+                    this.boxLabelImg,
+                    labelX,
+                    labelY,
+                    this.boxLabelImg.naturalWidth * imgScale,
+                    this.boxLabelImg.naturalHeight * imgScale
+                );
 
                 // draw rotated text centered on the label
                 if (this.boxLabelText.complete) {
@@ -395,8 +413,9 @@ class Box {
         const s1 = 100;
         const s2 = 300;
         const s3 = 600;
+        const isPortrait = resolution.UI_HEIGHT > resolution.UI_WIDTH;
         const w = resolution.uiScaledNumber(1024);
-        const h = resolution.uiScaledNumber(576);
+        const h = isPortrait ? 800 : resolution.uiScaledNumber(576);
 
         const renderBounce = () => {
             // get the elapsed time
@@ -429,18 +448,15 @@ class Box {
             if (!isNaN(sx) && !isNaN(sy)) {
                 ctx.save();
                 ctx.setTransform(1, 0, 0, 1, 0, 0);
-                ctx.clearRect(
-                    resolution.uiScaledNumber(312),
-                    resolution.uiScaledNumber(80),
-                    resolution.uiScaledNumber(400),
-                    resolution.uiScaledNumber(500)
-                );
+                const bx = isPortrait ? 96 : resolution.uiScaledNumber(312);
+                const by = isPortrait ? 200 : resolution.uiScaledNumber(80);
+                ctx.clearRect(bx, by, resolution.uiScaledNumber(400), resolution.uiScaledNumber(500));
                 ctx.restore();
 
                 ctx.save();
                 ctx.scale(sx, sy);
                 ctx.translate(tx, ty);
-                ctx.translate(resolution.uiScaledNumber(312), resolution.uiScaledNumber(130));
+                ctx.translate(bx, isPortrait ? 200 : resolution.uiScaledNumber(130));
                 this.draw(ctx, resolution.uiScaledNumber(140));
                 ctx.restore();
             }

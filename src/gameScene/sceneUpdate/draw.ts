@@ -116,7 +116,7 @@ const drawImpl = function drawImpl(scene: GameScene): void {
     }
 
     scene.support.draw();
-    scene.target.draw();
+    scene.videoCharacter?.draw(scene.target.x, scene.target.y);
     if (scene.sleepAnimPrimary?.visible) {
         scene.sleepAnimPrimary.draw();
     }

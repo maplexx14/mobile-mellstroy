@@ -51,6 +51,7 @@ export function resetGameState(this: GameSceneInit): void {
     this.starR.setWeight(1);
     this.isCandyInLantern = false;
     Lantern.removeAllLanterns();
+    this.videoCharacter = null;
     this.sleepAnimPrimary = null;
     this.sleepAnimSecondary = null;
     this.isNightTargetAwake = null;
