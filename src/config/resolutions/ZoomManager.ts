@@ -2,6 +2,16 @@ import resolution from "@/resolution";
 
 type StyleOverrides = Partial<Record<string, string>>;
 
+interface TelegramViewport {
+    viewportHeight?: number;
+    viewportStableHeight?: number;
+}
+
+// Portrait fills the viewport width but never crops more than this fraction of
+// the canvas height from the bottom, so bottom UI stays on screen on windows
+// wider than the 9:19.5 design ratio.
+const MAX_PORTRAIT_CROP = 0.12;
+
 class ZoomManager {
     #bgZoom = 1;
     #element: HTMLElement | null = null;
@@ -62,10 +72,28 @@ class ZoomManager {
 
     #getViewportSize(): { width: number; height: number } {
         const viewport = window.visualViewport;
-        return {
-            width: viewport?.width ?? window.innerWidth,
-            height: viewport?.height ?? window.innerHeight,
-        };
+        const width = viewport?.width ?? window.innerWidth;
+        let height = viewport?.height ?? window.innerHeight;
+
+        // In a Telegram Mini App the usable area is below the native header.
+        // viewportStableHeight reflects that area; visualViewport.height can
+        // report more (counting space under the header), which would make the
+        // "contain" fit overflow. Prefer the smaller, header-aware value.
+        const tg = (window as unknown as { Telegram?: { WebApp?: TelegramViewport } }).Telegram
+            ?.WebApp;
+        if (tg) {
+            const tgHeight =
+                tg.viewportStableHeight && tg.viewportStableHeight > 0
+                    ? tg.viewportStableHeight
+                    : tg.viewportHeight && tg.viewportHeight > 0
+                      ? tg.viewportHeight
+                      : 0;
+            if (tgHeight > 0) {
+                height = Math.min(height, tgHeight);
+            }
+        }
+
+        return { width, height };
     }
 
     resize(skipZoom = false): void {
@@ -82,11 +110,15 @@ class ZoomManager {
 
         if (!skipZoom) {
             if (this.#nativeHeight > this.#nativeWidth) {
-                // Portrait canvas: fit to viewport width so no content is
-                // cropped horizontally. Canvas height (1560) is chosen to match
-                // the 9:19.5 aspect ratio of most modern phones, so vertical
-                // black bars are also eliminated.
-                this.#zoom = vpWidth / nativeWidth;
+                // Portrait canvas: fill the viewport width and sacrifice overflow
+                // from the BOTTOM (anchored top below). But cap how much can be
+                // cropped so the bottom UI (menu Play button, HUD) never gets cut
+                // off on wider windows (e.g. Telegram Desktop). When filling width
+                // would crop more than MAX_PORTRAIT_CROP of the canvas height, the
+                // zoom is reduced instead, adding thin transparent side margins.
+                const fillWidth = vpWidth / nativeWidth;
+                const maxForCrop = vpHeight / (nativeHeight * (1 - MAX_PORTRAIT_CROP));
+                this.#zoom = Math.min(fillWidth, maxForCrop);
             } else {
                 // Landscape canvas: cover mode fills the viewport.
                 this.#zoom = Math.max(vpWidth / nativeWidth, vpHeight / nativeHeight);
@@ -100,9 +132,11 @@ class ZoomManager {
 
         const scaledWidth = nativeWidth * this.#zoom;
         const scaledHeight = nativeHeight * this.#zoom;
-        // Negative offsets center the oversized content, so the crop is symmetric.
         const left = Math.round((vpWidth - scaledWidth) / 2);
-        const top = Math.round((vpHeight - scaledHeight) / 2);
+        // Portrait anchors to the top so any vertical overflow is cropped from
+        // the bottom only; landscape centres (symmetric crop).
+        const top =
+            nativeHeight > nativeWidth ? 0 : Math.round((vpHeight - scaledHeight) / 2);
 
         this.updateCss({
             position: "absolute",

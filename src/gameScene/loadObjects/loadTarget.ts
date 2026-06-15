@@ -29,8 +29,10 @@ export function loadTarget(this: GameSceneLoaders, item: TargetItem): void {
     };
     this.target = target;
 
-    this.videoCharacter?.destroy();
-    this.videoCharacter = new VideoCharacter("/anims/out");
+    // Reuse one shared VideoCharacter across levels instead of recreating its 7
+    // <video> elements each time (which leaked decoder memory on iOS). play() is
+    // re-triggered for this level via the playTimeline hook below.
+    this.videoCharacter = VideoCharacter.shared("/anims/out");
 
     const boxType = edition.boxTypes?.[LevelState.pack];
     const isHolidayBox = boxType === BoxType.HOLIDAY;

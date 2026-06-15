@@ -33,25 +33,29 @@ class ImageElement extends BaseElement {
         }
     }
 
-    getTexture(resId: number): Texture2D {
+    getTexture(resId: number): Texture2D | null {
         // using the resMgr would create a circular dependency,
         // so we'll assume its been loaded and fetch directly
         const resEntry = RES_DATA[resId];
         if (!resEntry) {
-            throw new Error(`ResEntry not found for resId: ${resId}`);
+            Log.debug(`ResEntry not found for resId: ${resId}`);
+            return null;
         }
 
         const texture = resEntry.texture;
         if (!texture) {
             Log.debug(`Image not loaded: ${resEntry.path}`);
-            throw new Error(`Texture not loaded for: ${resEntry.path}`);
+            return null;
         }
         return texture;
     }
 
     override initTextureWithId(resId: number) {
         this.resId = resId;
-        this.initTexture(this.getTexture(resId));
+        const texture = this.getTexture(resId);
+        if (texture) {
+            this.initTexture(texture);
+        }
     }
 
     setTextureQuad(n: number) {
@@ -59,6 +63,9 @@ class ImageElement extends BaseElement {
 
         // don't set width / height to quad size if we cut transparency from each quad
         if (!this.restoreCutTransparency) {
+            if (!this.texture) {
+                return;
+            }
             const rect = this.texture.rects[n];
             if (!rect) {
                 return;
@@ -69,13 +76,16 @@ class ImageElement extends BaseElement {
     }
 
     setDrawFullImage() {
+        if (!this.texture) {
+            return;
+        }
         this.quadToDraw = Constants.UNDEFINED;
         this.width = this.texture.imageWidth;
         this.height = this.texture.imageHeight;
     }
 
     override doRestoreCutTransparency() {
-        if (this.texture.preCutSize.x !== Vector.undefined.x) {
+        if (this.texture && this.texture.preCutSize.x !== Vector.undefined.x) {
             this.restoreCutTransparency = true;
             this.width = this.texture.preCutSize.x;
             this.height = this.texture.preCutSize.y;
@@ -275,6 +285,9 @@ class ImageElement extends BaseElement {
     }
 
     pointInDrawQuad(x: number, y: number): boolean {
+        if (!this.texture) {
+            return false;
+        }
         if (this.quadToDraw === Constants.UNDEFINED) {
             return Rectangle.pointInRect(
                 x,
@@ -321,6 +334,9 @@ class ImageElement extends BaseElement {
 
     setElementPositionWithOffset(resId: number, index: number) {
         const texture = this.getTexture(resId);
+        if (!texture) {
+            return;
+        }
         const offset = texture.offsets[index];
         if (!offset) {
             return;
@@ -331,6 +347,9 @@ class ImageElement extends BaseElement {
 
     setElementPositionWithCenter(resId: number, index: number) {
         const texture = this.getTexture(resId);
+        if (!texture) {
+            return;
+        }
         const rect = texture.rects[index];
         const offset = texture.offsets[index];
         if (!rect || !offset) {
@@ -344,7 +363,7 @@ class ImageElement extends BaseElement {
         const image = new ImageElement();
         image.initTextureWithId(resId);
 
-        if (drawQuad != null) {
+        if (drawQuad != null && image.texture) {
             image.setTextureQuad(drawQuad);
         }
 

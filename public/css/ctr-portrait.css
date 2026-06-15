@@ -10,6 +10,16 @@
  * ≈390×844 — matching iPhone 14's 9:19.5 ratio with no cropping.
  */
 
+/* ---- Loading screen: cover the full viewport in portrait orientation ---- */
+.ui-portrait #betterLoader {
+    background-size: cover;
+    background-position: center center;
+}
+.ui-portrait #track {
+    width: min(300px, calc(100% - 40px));
+    bottom: 8vh;
+}
+
 /* ---- Structure: make every full-screen layer portrait ---- */
 .ui-portrait #gameContainer {
     margin: 0;
@@ -65,7 +75,7 @@
 }
 
 .ui-portrait #miniOptionsMenu {
-    top: 1380px;
+    top: 1300px;
     left: 28px;
 }
 

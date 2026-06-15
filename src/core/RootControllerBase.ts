@@ -165,8 +165,11 @@ class RootControllerBase extends ViewController {
         this.activateMouseEvents();
 
         const requestAnimationFrame = window.requestAnimationFrame.bind(window);
-        const animationLoop = (): void => {
-            const now = Date.now();
+        // Use rAF's high-resolution timestamp instead of Date.now(): it is more
+        // accurate (matters for delta timing on 120Hz displays) and avoids a
+        // system clock read every frame. Deltas use only differences, so the
+        // (performance-based) time base is consistent.
+        const animationLoop = (now: number): void => {
             this.operateCurrentMVC(now);
             if (!this.stopAnimation) {
                 requestAnimationFrame(animationLoop);
@@ -174,7 +177,7 @@ class RootControllerBase extends ViewController {
         };
 
         this.stopAnimation = false;
-        animationLoop();
+        requestAnimationFrame(animationLoop);
     }
 
     override deactivate(): void {

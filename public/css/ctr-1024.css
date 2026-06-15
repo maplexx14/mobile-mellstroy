@@ -1,21 +1,15 @@
 .ui-1024 #betterLoader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("../images/1024/page/loader-logo.jpg") no-repeat;
-    z-index: 100;
-    color: #fff;
+    background: url("../images/1024/page/loader-logo.jpg") no-repeat center center;
+    background-size: cover;
 }
 .ui-1024 #track {
-    width: 277px;
+    width: min(277px, calc(100% - 40px));
     height: 18px;
     border-radius: 20px;
     position: absolute;
-    bottom: 0;
-    left: 370px;
-    top: 528px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 30px;
     background: linear-gradient(to bottom, #c6c6c6 0%, #d6d6d6 100%); /* W3C */
 }
 
@@ -53,7 +47,6 @@
     position: relative;
     width: 1024;
     height: 576;
-    background-color: #000;
 }
 
 .ui-1024 #e {

@@ -13,7 +13,17 @@ export interface ImageAsset {
     sourceUrl: string;
 }
 
-const supportsImageBitmap = typeof createImageBitmap === "function";
+// iOS WKWebView (incl. Telegram iOS) discards ImageBitmap backing stores under
+// memory pressure — after a few levels every drawImage(bitmap) renders blank and
+// never recovers, because an ImageBitmap has no source to re-decode from. An
+// HTMLImageElement keeps its encoded source, so WebKit transparently re-decodes
+// it when drawn again. Decode to <img> on iOS to keep textures durable.
+const isIOS =
+    typeof navigator !== "undefined" &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
+const supportsImageBitmap = typeof createImageBitmap === "function" && !isIOS;
 
 const getUrlFacade = (): UrlFacade | null => {
     if (typeof URL !== "undefined" && typeof URL.createObjectURL === "function") {
@@ -110,6 +120,21 @@ const loadImageFromBlob = async (blob: Blob, fallbackUrl: string): Promise<HTMLI
 export const loadImageAsset = async (url: string): Promise<ImageAsset> => {
     if (!url) {
         throw new Error("Image URL must be provided");
+    }
+
+    // iOS: load straight into an <img>. It keeps its source so WebKit can
+    // re-decode after discarding the backing store under memory pressure,
+    // preventing textures from going blank after several levels.
+    if (isIOS) {
+        const img = await loadImageElement(url);
+        // Kick off a best-effort pre-decode but DO NOT await it: on iOS
+        // img.decode() can hang and never settle under memory pressure, which
+        // would stall the whole level load and leave a permanent black screen.
+        // drawImage decodes lazily anyway if this hasn't finished.
+        if (typeof img.decode === "function") {
+            void img.decode().catch(() => {});
+        }
+        return createImageAsset(img, url);
     }
 
     if (!supportsImageBitmap && !getUrlFacade()) {

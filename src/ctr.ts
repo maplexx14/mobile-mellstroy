@@ -3,6 +3,7 @@ import platform from "@/config/platforms/platform-web";
 import settings from "@/game/CTRSettings";
 import LangId from "@/resources/LangId";
 import PubSub from "@/utils/PubSub";
+import FpsCounter from "@/utils/FpsCounter";
 import { showProcessingOverlay, hideProcessingOverlay } from "@/ui/processingOverlay";
 import "@/game/CTRRootController";
 import "@/game/CTRSoundMgr";
@@ -101,6 +102,8 @@ const boot = async (): Promise<void> => {
 
     App.domReady();
     App.run();
+
+    FpsCounter.start();
 };
 
 if (document.readyState === "loading") {

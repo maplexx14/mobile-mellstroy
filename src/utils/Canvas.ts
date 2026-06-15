@@ -36,6 +36,10 @@ class Canvas {
     setTarget(element: HTMLCanvasElement): void {
         this.id = element;
         this.element = element;
+        // NOTE: do not enable `desynchronized` here. The game clears the whole
+        // canvas each frame and redraws; on WebKit/iOS the low-latency
+        // desynchronized path can present a frame mid-clear, causing brief
+        // full-screen black flashes.
         const context = this.element.getContext("2d");
         if (!context) {
             throw new Error("Failed to get 2D context from canvas element");

@@ -1,21 +1,15 @@
 .ui-1920 #betterLoader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("../images/1920/page/loader-logo.webp") no-repeat;
-    z-index: 100;
-    color: #fff;
+    background: url("../images/1920/page/loader-logo.webp") no-repeat center center;
+    background-size: cover;
 }
 .ui-1920 #track {
-    width: 520px;
+    width: min(520px, calc(100% - 40px));
     height: 35px;
     border-radius: 20px;
     position: absolute;
-    bottom: 0;
-    left: 694px;
-    top: 990px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 60px;
     background: linear-gradient(to bottom, #c6c6c6 0%, #d6d6d6 100%); /* W3C */
 }
 
@@ -29,7 +23,6 @@
     position: relative;
     width: 1920;
     height: 1080;
-    background-color: #000;
 }
 
 .ui-1920 #e {

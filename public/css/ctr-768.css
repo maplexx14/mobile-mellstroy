@@ -1,3 +1,23 @@
+.ui-768 #betterLoader {
+    background: url("../images/1024/page/loader-logo.jpg") no-repeat center center;
+    background-size: cover;
+}
+.ui-768 #track {
+    width: min(277px, calc(100% - 40px));
+    height: 18px;
+    border-radius: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 30px;
+    background: linear-gradient(to bottom, #c6c6c6 0%, #d6d6d6 100%); /* W3C */
+}
+.ui-768 #progress {
+    background: url("../images/480/ui/load-repeat.webp") repeat-x;
+    width: 10%;
+    height: 18px;
+    border-radius: 18px;
+}
 .ui-768 .useSD {
     display: block;
 }
@@ -26,7 +46,6 @@
     position: relative;
     width: 768;
     height: 432;
-    background-color: #000;
 }
 
 .ui-768 #e {

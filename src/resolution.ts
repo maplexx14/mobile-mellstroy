@@ -44,14 +44,14 @@ const getViewportSize = (): { width: number; height: number } => {
 const selectResolution = (): ResolutionCandidate => {
     const { width, height } = getViewportSize();
 
-    // Force portrait on Telegram mobile platforms regardless of viewport size
-    // reported at init time (expand() may not have taken effect yet).
-    const tgPlatform = (window as any).Telegram?.WebApp?.platform ?? "";
-    const isTelegramMobile = tgPlatform === "ios" || tgPlatform === "android";
+    // Telegram Mini App panels are portrait on every client — phone, Desktop
+    // and Web alike — so always use the portrait profile inside Telegram,
+    // regardless of the viewport size reported at init (expand() may not have
+    // taken effect yet, and Desktop can momentarily report a wide viewport).
+    // Outside Telegram, fall back to viewport orientation.
+    const insideTelegram = !!(window as any).Telegram?.WebApp;
 
-    // Phones are held in portrait: a vertical viewport gets the portrait profile,
-    // which renders the level full-screen. Landscape (desktop) keeps the wide profile.
-    if (isTelegramMobile || height > width) {
+    if (insideTelegram || height > width) {
         return { profile: resPortrait, isHd: true, minWidth: 0, minHeight: 0 };
     }
 
